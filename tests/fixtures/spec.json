@@ -1,0 +1,19 @@
+{
+  "course_id": "TEST-COURSE",
+  "course_name": "Synthetic Course",
+  "reference_year": 2025,
+  "lambda": 0.2,
+  "tau": 1.0,
+  "lambda_grid": [0.0, 0.2, 0.4],
+  "tau_grid": [0.5, 1.0, 2.0],
+  "papers": [
+    {"year": "2020", "pdf": "unused.pdf", "role": "formal", "expected_questions": 50},
+    {"year": "2021", "pdf": "unused.pdf", "role": "formal", "expected_questions": 50},
+    {"year": "2022", "pdf": "unused.pdf", "role": "formal", "expected_questions": 50},
+    {"year": "2023", "pdf": "unused.pdf", "role": "formal", "expected_questions": 50},
+    {"year": "2024", "pdf": "unused.pdf", "role": "formal", "expected_questions": 50}
+  ],
+  "mapping_path": "tests/fixtures/mapping.json",
+  "coverage_path": "tests/fixtures/coverage.json",
+  "output_dir": "tests/fixtures/output"
+}

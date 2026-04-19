@@ -1,4 +1,0 @@
-interface:
-  display_name: "Past Paper Topic Analysis"
-  short_description: "Map slides and papers into hotness and retention"
-  default_prompt: "Use $past-paper-knowledge-point-analysis to analyze lecture slides, past papers, and optional answer keys into English knowledge-point hotness and retention outputs."

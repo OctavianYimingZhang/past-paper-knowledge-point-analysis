@@ -1,0 +1,15 @@
+{
+  "mapping_version": 1,
+  "questions": [
+    {"year": "2020", "question_number": 1, "primary_kp": "L01.01", "secondary_kps": [], "confidence": 0.9},
+    {"year": "2021", "question_number": 1, "primary_kp": "L01.01", "secondary_kps": [], "confidence": 0.9},
+    {"year": "2022", "question_number": 1, "primary_kp": "L01.01", "secondary_kps": [], "confidence": 0.9},
+    {"year": "2023", "question_number": 1, "primary_kp": "L01.01", "secondary_kps": [], "confidence": 0.9},
+    {"year": "2024", "question_number": 1, "primary_kp": "L01.01", "secondary_kps": [], "confidence": 0.9},
+
+    {"year": "2023", "question_number": 2, "primary_kp": "L02.01", "secondary_kps": [], "confidence": 0.7},
+    {"year": "2024", "question_number": 2, "primary_kp": "L02.01", "secondary_kps": [], "confidence": 0.7},
+
+    {"year": "2020", "question_number": 3, "primary_kp": "L03.01", "secondary_kps": [], "confidence": 0.8}
+  ]
+}

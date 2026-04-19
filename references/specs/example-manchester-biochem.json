@@ -1,0 +1,72 @@
+{
+  "course_id": "BIOL10212",
+  "course_name": "Biochemistry",
+  "preset_id": "biochemistry-manchester",
+  "output_language": "en",
+  "reference_year": 2025,
+  "lambda": 0.2,
+  "tau": 1.0,
+  "lambda_grid": [0.0, 0.2, 0.4],
+  "tau_grid": [0.5, 1.0, 2.0],
+  "notes_pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/Lecture Notes-Octavian Zhang/Biochemistry.pdf",
+  "papers": [
+    {
+      "year": "2016",
+      "pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Past papers/Biochemistry 2016.pdf",
+      "role": "formal",
+      "expected_questions": 45,
+      "skip_pages": 2
+    },
+    {
+      "year": "2017",
+      "pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Past papers/Biochemistry 2017.pdf",
+      "role": "formal",
+      "expected_questions": 45,
+      "skip_pages": 2
+    },
+    {
+      "year": "2018",
+      "pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Past papers/Biochemistry 2018.pdf",
+      "role": "formal",
+      "expected_questions": 45,
+      "skip_pages": 2
+    },
+    {
+      "year": "2019",
+      "pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Past papers/Biochemistry 2019.pdf",
+      "role": "formal",
+      "expected_questions": 45,
+      "skip_pages": 2
+    },
+    {
+      "year": "2020",
+      "pdf": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Past papers/Biochemistry 2020.pdf",
+      "role": "formal",
+      "expected_questions": 45,
+      "skip_pages": 2
+    }
+  ],
+  "answer_keys": [
+    {
+      "year": "2016",
+      "docx": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Answer Key/Answer Key with Reasoning Biochemistry 2016.docx"
+    },
+    {
+      "year": "2017",
+      "docx": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Answer Key/Answer Key with Reasoning Biochemistry 2017.docx"
+    },
+    {
+      "year": "2018",
+      "docx": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Answer Key/Answer Key with Reasoning Biochemistry 2018.docx"
+    },
+    {
+      "year": "2019",
+      "docx": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Answer Key/Answer Key with Reasoning Biochemistry 2019.docx"
+    },
+    {
+      "year": "2020",
+      "docx": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Answer Key/Answer Key with Reasoning Biochemistry 2020.docx"
+    }
+  ],
+  "output_dir": "/Users/octavianzhang/Library/CloudStorage/OneDrive-个人/University of Manchester-School of Biological Science/Year 1/Analysis/Biochemistry-output"
+}
