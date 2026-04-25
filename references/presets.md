@@ -31,6 +31,65 @@ one and two. The shared defaults are:
 | `chemistry-for-bioscientists-2-manchester` | CHEM10022 | Chemistry for Bioscientists 2 | 2017, 2021, 2024, 2025 | 50 |
 | `biodiversity-manchester` | BIOL10401 | Biodiversity | 2018, 2020, 2021 | 40 |
 
+The Manchester biology presets do not currently bundle a `textbook_pdf`.
+The pattern layer can still run from lecture material alone, but pattern
+sources will all be `lecture` rather than mixed `textbook + lecture`.
+When a textbook PDF is added to a preset, every pattern derived from it
+should cite the chapter or worked-example number under `source`.
+
+## Edexcel International Advanced Level (IAL) Mathematics
+
+These presets cover Pearson Edexcel IAL Maths units. **Each unit pairs
+with its own Pearson student book**; do not share a textbook between
+units. Unit codes are short — Pure 1 to Pure 4 are `WMA11..WMA14`,
+Mechanics 1 to Mechanics 3 are `WME01..WME03`, Statistics 1 to
+Statistics 3 are `WST01..WST03`. Past papers cover Jan/Jun/Oct sittings;
+the spec tags them via the `year` string (e.g. `"2024-Jun"`).
+
+Shared defaults:
+
+- `skip_pages`: 1 (cover page only — Edexcel does not include extended
+  formula booklets in the paper PDFs).
+- `output_language`: `en` (CLI `--lang` may set zh or both at runtime).
+- `lambda_grid`: `[0.0, 0.2, 0.4]`.
+- `tau_grid`: `[0.5, 1.0, 2.0]`.
+- `alpha`: `0.3` (default novelty bias for the pattern layer).
+- `fresh_gap_years`: `4.0`.
+- `reference_year`: set by the student to the upcoming sitting year (e.g.
+  `2026` to predict the Jan 2026 sitting).
+
+Year encoding for the mapping layer: `Jan = .0`, `Jun = .4`, `Oct = .8`.
+
+| Preset ID | Unit | Unit name | Textbook (Pearson student book) | Typical papers |
+|-----------|------|-----------|---------------------------------|----------------|
+| `edexcel-ial-wma11` | WMA11 | Pure Mathematics 1 | *Pearson Edexcel IAL Pure Mathematics 1* student book | 2018 Jan onwards |
+| `edexcel-ial-wma12` | WMA12 | Pure Mathematics 2 | *Pearson Edexcel IAL Pure Mathematics 2* student book | 2018 Jan onwards |
+| `edexcel-ial-wma13` | WMA13 | Pure Mathematics 3 | *Pearson Edexcel IAL Pure Mathematics 3* student book | 2019 Jun onwards |
+| `edexcel-ial-wma14` | WMA14 | Pure Mathematics 4 | *Pearson Edexcel IAL Pure Mathematics 4* student book | 2019 Jun onwards |
+| `edexcel-ial-wme01` | WME01 | Mechanics 1 | *Pearson Edexcel IAL Mechanics 1* student book | 2014 Jan onwards |
+| `edexcel-ial-wme02` | WME02 | Mechanics 2 | *Pearson Edexcel IAL Mechanics 2* student book | 2014 Jan onwards |
+| `edexcel-ial-wme03` | WME03 | Mechanics 3 | *Pearson Edexcel IAL Mechanics 3* student book | 2014 Jan onwards |
+| `edexcel-ial-wst01` | WST01 | Statistics 1 | *Pearson Edexcel IAL Statistics 1* student book | 2014 Jan onwards |
+| `edexcel-ial-wst02` | WST02 | Statistics 2 | *Pearson Edexcel IAL Statistics 2* student book | 2014 Jan onwards |
+| `edexcel-ial-wst03` | WST03 | Statistics 3 | *Pearson Edexcel IAL Statistics 3* student book | 2014 Jan onwards |
+
+### Textbook uniqueness invariant
+
+Each Edexcel preset's `textbook_pdf` path must be unique to its
+`course_id`. Pure 1 and Pure 3 cover overlapping topics but use different
+student books with different worked-example sets and different
+end-of-chapter exercises, so the pattern taxonomy must be derived from
+the unit's own book. The CLI's preset-loader asserts uniqueness; sharing
+a textbook path between two units fails fast.
+
+### Why short-answer parser is required
+
+Every Edexcel IAL Maths paper is structured (questions with
+parts (a)/(b)/(c) and per-part marks). The relaxed parser introduced in
+the upgrade auto-detects this style — you should see
+`detected_style: "structured"` in `extracted-papers.json` for every paper
+of these presets.
+
 ## Coverage extraction rules (all Manchester presets)
 
 When the orchestrator computes curriculum coverage from lecture material

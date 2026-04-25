@@ -1,15 +1,28 @@
 # Tier Definitions
 
-Tiers replace the old `Anchor / Core / Recurring / One-off / Not tested`
-bands. Each tier is defined by rules on the Bayesian posterior, the trend
-signal, and the raw counts. Every tier assignment carries an ordered list
-of reasons so the decision is auditable.
+The skill carries **two parallel tier systems** that the student should
+read together but never confuse:
 
-All thresholds are stored in `scripts/statistical_model.assign_tier`.
-Changing them here without updating the function (and the snapshot tests)
+- The **KP tier** (`anchor / core / emerging / legacy / oneoff /
+  not_tested`) lives on each knowledge point and answers *whether* a topic
+  appears next sitting. It is decided from the moment-matched Beta
+  posterior, the recency-weighted trend, and raw counts.
+- The **pattern tier** (`saturated / hot / fresh / dormant`) lives on each
+  `(KP, pattern)` cell and answers *how* a topic is likely to be tested.
+  It is decided from frequency, recency, the saturation index, and the
+  freshness flag — never a posterior, because pattern data is too sparse
+  to support an honest credible interval.
+
+Each tier assignment (KP or pattern) carries an ordered list of reasons so
+the decision is auditable.
+
+All KP-tier thresholds are stored in
+`scripts/statistical_model.assign_tier`. All pattern-tier thresholds are
+stored in `scripts/pattern_coverage.assign_pattern_tier`. Changing them
+here without updating the corresponding function (and the snapshot tests)
 is a specification bug.
 
-## Tier Rules
+## KP Tier Rules
 
 The rules fire in the order listed. The first matching rule wins.
 
@@ -92,3 +105,56 @@ rule 5 fires with `raw_hits == 1`.
 Zero papers available for the KP, curriculum coverage 0.40. Rule 0 fires
 immediately. `posterior_mean` is prior-driven; warning records
 "curriculum-only inference".
+
+## Pattern Tier Rules
+
+The pattern tier decorates each `(kp_id, pattern_id)` cell with one of
+`saturated`, `hot`, `fresh`, or `dormant`. The rules fire in priority
+order; the first matching rule wins. Pattern tiers are orthogonal to KP
+tiers — a `not_tested` KP can host a `fresh` pattern (the textbook seeds
+the pattern, the examiner has not used it), and an `anchor` KP can host
+both `saturated` and `fresh` patterns at once.
+
+| Priority | Tier | Rule | Intended meaning |
+|----------|------|------|------------------|
+| 0 | `saturated` | `saturation_index >= 0.6` AND `raw_hits >= 2` | Examiner has been recycling this pattern in adjacent or near-adjacent sittings; downweight predicted score, drill once for safety, then move on |
+| 1 | `hot` | `predicted_score >= median(predicted_score for KP) * 1.25` AND `raw_hits >= 2` AND not `saturated` | Bread-and-butter pattern: regular hits, varied recently, primary drill target |
+| 2 | `fresh` | `freshness_flag == True` | Seeded by textbook or lecture, unseen for `fresh_gap_years` (default 4) or never used; asymmetric upside, prepare 1–2 worked examples |
+| 3 | `dormant` | otherwise | Either zero hits with no material seed, or last seen long ago without being seeded — low revision priority unless the student has spare time |
+
+### Worked examples — pattern layer
+
+- **Saturated.** `L13.03.P02` (tangent at named point on implicit curve) —
+  hits in 2021, 2022, 2023, 2024. `saturation_index = 0.78`,
+  `weighted_hits = 3.7`. Tier `saturated`. Reasons:
+  `("saturation_index=0.78 >= 0.6", "raw_hits=4 >= 2")`. Narrative phrase:
+  "examiner is recycling — drill once and move on".
+- **Hot.** `L02.03.P01` (closest approach of two ships) — hits in 2017,
+  2019, 2022, 2024 with full prompt variation. `saturation_index = 0.31`,
+  `predicted_score = 1.4 * KP_median`. Tier `hot`. Reasons:
+  `("predicted_score=2.1 >= 1.5", "raw_hits=4 >= 2",
+    "saturation_index=0.31 < 0.6")`.
+- **Fresh.** `L13.03.P05` (vertical-tangent edge case) — `raw_hits = 0`,
+  cited in textbook §5.4 example 14. Tier `fresh`. Reasons:
+  `("freshness_flag=True", "seeded by textbook §5.4 example 14")`.
+- **Dormant.** `L08.01.P03` (binomial expansion when `n` is irrational) —
+  unseen, unseeded by textbook for this unit. Tier `dormant`. Reasons:
+  `("raw_hits=0", "freshness_flag=False")`.
+
+## Anti-patterns — pattern layer
+
+The following are explicitly not allowed in the pattern layer:
+
+1. Reporting a Beta posterior or credible interval at the pattern level.
+   With `n_eff` of 0–5, any interval is honestly uninformative. Use
+   frequency + saturation + freshness wording instead.
+2. Calling a `fresh` pattern "low probability". Freshness is an asymmetric
+   upside, not a frequency claim. The examiner has not yet picked it up;
+   that says nothing about whether they will next sitting.
+3. Inventing pattern_ids in the mapping output. The `pattern-architect`
+   agent owns the taxonomy; the `pattern-classifier` agent must use ids
+   that already exist in `patterns.json` and surface mismatches in the
+   review queue.
+4. Collapsing predicted_score, saturation_index, and freshness_flag into a
+   single ranking number. Each surface answers a different question; the
+   DOCX report carries them as parallel columns.
