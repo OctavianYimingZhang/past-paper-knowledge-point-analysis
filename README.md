@@ -1,180 +1,144 @@
-# Past Paper Knowledge Point Analysis
+# Past-Paper Analysis Suite
 
-Predictive, uncertainty-quantified analysis of MCQ past papers and lecture
-material. The skill tells you how likely each course knowledge point is to
-appear on the next exam, how confident that call is, and how much the
-answer depends on modelling choices.
+A multi-skill Claude Code suite for predicting **what** topics will appear on the next sitting of a structured exam AND **how** they will be tested. Hub-and-spokes shape: one orchestrator dispatches material ingest → KP/pattern mapping → statistical analysis sequentially, then fans out cheat-sheet, drill-curation, and exam-technique writing **in parallel** before assembling a multi-format report.
 
-The skill was written for a University of Manchester School of Biological
-Sciences student who observed that around 20 of every 50 MCQ items are
-verbatim or near-verbatim repeats from older papers, and that certain
-topics are tested nearly every year. A prior version of the skill
-categorized topics with hard frequency cutoffs (greater than 75 percent
-"Anchor", greater than 50 percent "Core"). That method ignored the tiny
-sample size (four to ten papers), gave every paper equal weight regardless
-of recency, and offered no way to express uncertainty. This rewrite fixes
-all three.
+Built on the same architectural pattern as [`equity-research-suite`](https://github.com/OctavianYimingZhang/equity-research-suite) (same author).
 
-## What is new
+## What it produces
 
-- Moment-matched Beta posterior per knowledge point with a 95 percent
-  credible interval, recency-weighted by an exponential decay parameter
-  `lambda`.
-- A lecture-coverage regularization prior, strength capped at `tau` = 2,
-  clearly labelled as a prior rather than empirical evidence.
-- A split-halves bootstrap trend detector that replaces the
-  underpowered Mann-Kendall approach.
-- Tier rules that require posterior mean and credible-interval lower
-  bound to clear joint thresholds, not a single frequency cutoff.
-- A mandatory sensitivity sweep over `(lambda, tau)` plus a leave-one
-  paper-out stability check. Unstable KPs surface at the top of every
-  report.
-- An orchestration layer that delegates stages of the pipeline to Haiku,
-  Sonnet, and Opus subagents in Claude Code based on the judgment level
-  each stage needs.
+For every knowledge point (KP) in your course, the suite emits:
 
-## How it works
+- A **moment-matched Beta posterior** with a 95% credible interval over "this topic appears next sitting".
+- A **tier assignment** — `anchor`, `core`, `emerging`, `legacy`, `oneoff`, `not_tested` — driven by deterministic rules with auditable `tier_reasons`.
+- A **pattern decomposition**: which question variants the examiner has been recycling (`saturated`), which they've started using recently (`hot`), which the syllabus seeds but they haven't picked up in 4+ years (`fresh`), and which appear once and then drop (`dormant`).
+- A **cheat-sheet card**: tier rationale, dominant pattern, "already tested" rows citing real `(year, question_number)` tuples, "still possible" rows for fresh patterns, narrative + how-it-will-be-tested prose.
+- A **drill set** of 5–8 past-paper questions per anchor / core KP plus 1–2 fresh-pattern construction prompts.
+- **Exam-technique coaching** prose: approach, marks-walk, common traps, examiner signal, pre-read checklist.
 
-1. Haiku subagents run mechanical extraction on papers, lectures, and
-   answer keys.
-2. A Sonnet subagent consolidates candidate topics into a final
-   knowledge-point list and maps every question to one primary KP.
-3. The pure-Python statistical core computes the posterior, credible
-   interval, trend, and tier for every KP, plus the sensitivity sweep and
-   leave-one-out analysis.
-4. An Opus subagent interprets borderline or unstable results for the
-   student in plain language.
-5. Haiku assembles the final Markdown, merging the Opus narratives into
-   the auto-generated report.
+Output formats: `.docx` (the headline revision-plan deliverable), `.xlsx` (drill-down audit), `.md` (git-friendly diff), `.json` (re-runs).
 
-See `SKILL.md` for the orchestration contract and
-`skills/past-paper-orchestrator/references/subagent-orchestration.md` for
-the prompt templates.
-
-> **Suite restructure in progress.** The skill is being split into a
-> hub-and-spokes suite (one orchestrator + multiple specialist skills) so
-> each stage can be invoked standalone or dispatched in parallel. The
-> root `SKILL.md` is still authoritative until the orchestrator
-> `skills/past-paper-orchestrator/SKILL.md` lands. Pure-Python utilities
-> have already moved to `core/`; subagent prompts and reference docs have
-> moved into `skills/<spoke>/`.
-
-## Repository layout
+## Suite layout
 
 ```
 past-paper-analysis-suite/
-  SKILL.md                                 # current entry point (Phase B will move this into the orchestrator)
-  README.md
-  requirements.txt
-  core/                                    # shared pure-Python utilities (no LLM)
-    statistical_model.py
-    pattern_coverage.py
-    sensitivity.py
-    kp_cheatsheet.py
-  skills/                                  # one Skill bundle per stage / specialist
-    past-paper-orchestrator/
-      references/
-        methodology.md
-        tier-definitions.md
-        subagent-orchestration.md
-        course-spec-schema.md
-        presets.md
-        specs/
-          example-manchester-biochem.json
-    paper-ingest/agents/ocr-extractor.md
-    kp-pattern-mapper/agents/{topic-mapper,pattern-architect,pattern-classifier}.md
-    cheatsheet-writer/agents/statistical-interpreter.md
-    drill-curator/                         # added in Phase C
-    technique-coach/                       # added in Phase C
-    stat-engine/                           # delegates to core/
-    report-renderer/                       # wraps anthropics-skills:docx + xlsx
-  scripts/
-    analyze_past_papers.py                 # CLI entry point
-    extract_papers.py
-    extract_lectures.py
-    extract_textbook.py
-    extract_answer_keys.py
-    report_writer/                         # md + docx + xlsx writers (used by report-renderer)
-    vision_ocr.swift                       # optional macOS OCR helper
-  tests/
-    test_statistical_model.py
-    test_pattern_coverage.py
-    test_sensitivity.py
-    test_kp_cheatsheet.py
-    test_extract_papers.py
-    test_extract_textbook.py
-    test_report_writer_docx.py
-    fixtures/
+├── skills/                          # One Skill bundle per stage / specialist
+│   ├── past-paper-orchestrator/     # [Hub] Dispatches the rest
+│   │   ├── SKILL.md
+│   │   └── references/              # methodology, tier definitions, voice rules, format spec
+│   ├── paper-ingest/                # [Spoke] Haiku 4.5 — extract papers / lectures / textbook / answer keys
+│   ├── kp-pattern-mapper/           # [Spoke] Sonnet 4.6 — KP → pattern → mapping
+│   ├── stat-engine/                 # [Spoke] Pure Python — Beta posteriors + saturation + freshness
+│   ├── cheatsheet-writer/           # [Spoke] Opus 4.7 — per-KP narrative cards
+│   ├── drill-curator/               # [Spoke] Opus 4.7 — drill picks + fresh challenges
+│   ├── technique-coach/             # [Spoke] Opus 4.7 — exam strategy prose
+│   └── report-renderer/             # [Spoke] Pure Python — multi-format export
+├── core/                            # Shared pure-Python utilities
+│   ├── statistical_model.py
+│   ├── pattern_coverage.py
+│   ├── sensitivity.py
+│   ├── kp_cheatsheet.py
+│   └── bilingual_glossary.py
+├── scripts/                         # CLI orchestrator + extraction modules + writers
+│   ├── analyze_past_papers.py
+│   ├── extract_papers.py            # MCQ + short-answer + structured-paper parser
+│   ├── extract_lectures.py
+│   ├── extract_textbook.py
+│   ├── extract_answer_keys.py
+│   └── report_writer/
+├── references/
+│   └── external-borrowings.md       # Provenance log gating any open-source lift
+├── tests/                           # 166 tests; pytest -q
+└── install.sh                       # Suite installer (core / full profiles)
 ```
+
+## Skill grid
+
+| Skill | Role | Mode A (standalone) | Mode B (embedded) | Model |
+|-------|------|---------------------|-------------------|-------|
+| `past-paper-orchestrator` | Hub: pipeline + parallel synthesis dispatch | n/a (entry point) | n/a | (orchestrates) |
+| `paper-ingest` | Material extraction | Returns extracted JSONs + warning summary | Returns paths only | Haiku 4.5 |
+| `kp-pattern-mapper` | KP + pattern + question mapping | Returns full taxonomy + diagnostics | Returns paths + 1-line summary | Sonnet 4.6 |
+| `stat-engine` | Bayesian + saturation statistics | Returns posteriors + tier table | Same | Pure Python (no LLM) |
+| `cheatsheet-writer` | Per-KP narrative cards | Markdown rendering | Structured cards | Opus 4.7 |
+| `drill-curator` | Drill picks + fresh challenges | Markdown bullet list | JSON cards | Opus 4.7 |
+| `technique-coach` | Exam strategy prose | Markdown coaching doc | JSON inserts | Opus 4.7 |
+| `report-renderer` | Multi-format export | Files in `output/` | Same | Pure Python (no LLM) |
+
+Synthesis spokes 4–6 (`cheatsheet-writer`, `drill-curator`, `technique-coach`) **must** be dispatched in a single message (three concurrent `Skill` tool calls). Sequential dispatch is the bottleneck the suite eliminates.
 
 ## Installation
 
 Python 3.11 or newer is required.
 
 ```bash
+# 1. Install Python dependencies
 pip install -r requirements.txt
+
+# 2. Symlink each skill into ~/.claude/skills/
+./install.sh                    # core profile (1 hub + 7 spokes)
+./install.sh full               # core + verifies Anthropic companions are reachable
+./install.sh --dry-run          # preview without changes
+./install.sh --uninstall        # remove all suite symlinks
 ```
 
-## Run
+The installer is non-destructive: it symlinks instead of copying, refuses to overwrite paths it didn't create, and writes `~/.claude/skills/.past-paper-suite-manifest` so a later `--uninstall` is clean.
 
-The skill runs in stages. Each stage produces a JSON artifact in
-`output_dir` that the next stage consumes.
+## Usage
 
-```bash
-# Stage 2: mechanical paper extraction
-python3 -m scripts.analyze_past_papers extract-papers --spec path/to/spec.json
+Top-level invocation goes through the orchestrator skill:
 
-# Stage 3: lecture coverage
-python3 -m scripts.analyze_past_papers extract-lectures --spec path/to/spec.json
-
-# Stage 4: answer-key image dump and text parse (optional)
-python3 -m scripts.analyze_past_papers extract-answer-keys --spec path/to/spec.json
-
-# Stages 5 and 6 are delegated to a Sonnet subagent; they write mapping.json.
-
-# Stage 7: Bayesian posterior, sensitivity sweep, and reports
-python3 -m scripts.analyze_past_papers analyze --spec path/to/spec.json
+```
+past-paper-orchestrator --spec /path/to/course-spec.json --mode analyst --lang en
 ```
 
-## Outputs
+Modes:
+- `analyst` (default): dense revision deliverable. Compact executive summary, per-KP cheat-sheet middle, methodology appendix.
+- `student`: friendlier. Drops the methodology appendix, drops Bayesian jargon from the body, front-loads the recommended drill set.
 
-In `output_dir`:
+Languages:
+- `en` (default), `zh`, `both` (stacked CN-then-EN, never side-by-side).
 
-- `<course_id>-analysis.xlsx` with sheets `Method`,
-  `Posterior_Predictions`, `Sensitivity_Sweep`, `Leave_One_Out`,
-  `Trend_Analysis`, `Review_Queue`.
-- `<course_id>-analysis.json` containing every posterior, every sweep
-  cell, and every leave-one-out row. Sufficient to reproduce the Excel
-  and Markdown deterministically.
-- `<course_id>-analysis.md` with unstable KPs surfaced first, tier
-  summary tables, and (once stage 8 runs) Opus-written narratives for
-  borderline KPs.
+Each spoke is also individually invokable. Example: regenerate just the cheat-sheets from existing analysis JSONs:
+
+```
+cheatsheet-writer --analysis output/<course>-analysis.json \
+                  --pattern-coverage output/pattern-coverage.json \
+                  --mapping output/mapping.json \
+                  --mode student --lang both
+```
+
+See each spoke's `SKILL.md` for its standalone contract.
 
 ## Tests
 
 ```bash
-python3 -m pytest tests/ -q
+pytest -q
 ```
 
-The statistical core has full unit coverage: recency weighting, credible
-interval bounds, prior construction, trend detection, tier assignment,
-sensitivity sweep, and leave-one-out stability.
+Currently 166 tests across:
+- `tests/test_statistical_model.py` — KP posterior, tier assignment, trend detection.
+- `tests/test_pattern_coverage.py` — saturation, freshness, predicted score.
+- `tests/test_sensitivity.py` — sensitivity sweep, leave-one-out stability.
+- `tests/test_kp_cheatsheet.py` — cheat-sheet assembly.
+- `tests/test_extract_papers.py`, `test_extract_textbook.py` — parsers.
+- `tests/test_report_writer_docx.py` — DOCX rendering.
+- `tests/test_bilingual_glossary.py` — glossary persistence.
+- `skills/past-paper-orchestrator/tests/test_orchestration_smoke.py` — end-to-end smoke + suite-shape invariants.
 
 ## Statistical contract
 
-- Every probability is reported with a credible interval. A point
-  estimate without its interval is a bug.
-- Tier assignments must include a reasons list. A tier without reasons
-  is a bug.
-- The model is a moment-matched Beta approximation under recency
-  weighting. It is not a strict conjugate posterior. The word
-  "conjugate" must not appear in user-facing output.
-- `lambda` is swept over `{0, 0.2, 0.4}` and `tau` over `{0.5, 1.0, 2.0}`
-  by default. Results that flip tiers across the sweep are labelled
-  unstable and surfaced first.
+- Every KP-level probability ships with a credible interval. A point estimate without its interval is a bug.
+- The KP layer is a **moment-matched Beta** approximation under recency-weighted hits. The word "conjugate" is banned in user-facing output (it is an approximation, not a strict conjugate update).
+- The pattern layer is **frequency + saturation + freshness**. With ≤ 5 hits per cell, a Beta posterior is uselessly wide. The suite is honest about that — pattern-level claims never carry credible intervals.
+- `lambda` is swept over `{0, 0.2, 0.4}` and `tau` over `{0.5, 1.0, 2.0}` by default. KPs that flip tiers across the sweep are tagged `unstable` and surfaced first.
+- Every claim in the prose layer is defensible from the data — cite a `(year, question_number)`, a saturation index, a posterior, a tier reason, or a textbook section.
 
 Full details in `skills/past-paper-orchestrator/references/methodology.md`.
 
-## Licensing
+## External borrowings
 
-Apache 2.0. See `LICENSE`.
+Every code or pattern lift from outside this repo is logged in `references/external-borrowings.md` with license + last-verification date + carrier file. Lifts without a row there are unauthorised; reviewers should reject them.
+
+## License
+
+MIT. See `LICENSE`.
