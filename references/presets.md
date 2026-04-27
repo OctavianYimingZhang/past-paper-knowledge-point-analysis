@@ -90,6 +90,190 @@ the upgrade auto-detects this style — you should see
 `detected_style: "structured"` in `extracted-papers.json` for every paper
 of these presets.
 
+## Manchester School of Biological Sciences, Year 2
+
+These presets cover Year 2 modules. Course codes are not yet recorded in
+this file: the actual School of Biological Sciences module codes follow
+the `BIOL2xxxx` family but the precise four-digit suffixes need to be
+looked up in the school handbook before being committed. Until that
+lookup is done, the `Course code` column carries the placeholder
+`BIOL2????` rather than an invented value.
+
+Shared defaults match the Year 1 block (`skip_pages: 2`,
+`output_language: en`, `lambda_grid: [0.0, 0.2, 0.4]`,
+`tau_grid: [0.5, 1.0, 2.0]`, OCR enabled for DOCX answer keys with
+scanned images).
+
+`Expected questions` is left blank below. Year 2 papers vary between
+short-answer, structured, and essay-only formats and the per-paper count
+should be set in the spec rather than guessed at the preset level.
+
+| Preset ID | Course code | Course name | Typical papers | Expected questions |
+|-----------|-------------|-------------|----------------|--------------------|
+| `animal-behaviour-manchester-y2` | BIOL2???? | Animal Behaviour | 2021 to 2025 (selected) |  |
+| `animal-diversity-manchester-y2` | BIOL2???? | Animal Diversity | 2018 to 2023 (selected) |  |
+| `animal-physiology-manchester-y2` | BIOL2???? | Animal Physiology | 2023 to 2025 |  |
+| `anatomy-special-sense-organs-manchester-y2` | BIOL2???? | Anatomy of the Special Sense Organs | 2023 to 2024 |  |
+| `body-systems-2-manchester-y2` | BIOL2???? | Body Systems 2 | 2021 to 2024 (selected) |  |
+| `cell-adhesion-manchester-y2` | BIOL2???? | Cell Adhesion | 2023 to 2025 |  |
+| `cell-membrane-structure-function-manchester-y2` | BIOL2???? | Cell Membrane Structure & Function | 2016 to 2025 (selected) |  |
+| `cell-metabolism-metabolic-control-manchester-y2` | BIOL2???? | Cell Metabolism & Metabolic Control | 2022 to 2024 |  |
+| `chemistry-of-biomolecules-manchester-y2` | BIOL2???? | Chemistry of Biomolecules | 2016 to 2025 (selected) |  |
+| `clinical-drug-development-manchester-y2` | BIOL2???? | Clinical Drug Development | 2015 to 2024 (selected) |  |
+| `drugs-and-the-brain-manchester-y2` | BIOL2???? | Drugs and the Brain | 2018 to 2025 (selected) |  |
+| `fundamentals-of-bacteriology-manchester-y2` | BIOL2???? | Fundamentals of Bacteriology | 2023 to 2025 |  |
+| `fundamentals-of-evolutionary-biology-manchester-y2` | BIOL2???? | Fundamentals of Evolutionary Biology | 2016 to 2025 (selected) |  |
+| `gut-and-renal-human-physiology-manchester-y2` | BIOL2???? | Gut and Renal Human Physiology | 2016 |  |
+| `haematology-manchester-y2` | BIOL2???? | Haematology | 2016 to 2025 (selected) |  |
+| `how-to-make-a-brain-manchester-y2` | BIOL2???? | How to Make a Brain | 2017 to 2025 (selected) |  |
+| `human-anatomy-histology-manchester-y2` | BIOL2???? | Human Anatomy & Histology | 2016 to 2025 (selected, plus mock) |  |
+| `immunology-manchester-y2` | BIOL2???? | Immunology | 2016 to 2025 (selected) |  |
+| `introduction-to-cancer-manchester-y2` | BIOL2???? | Introduction to Cancer | 2023 to 2025 |  |
+| `introduction-to-virology-manchester-y2` | BIOL2???? | Introduction to Virology | 2023 to 2025 |  |
+| `membrane-excitability-manchester-y2` | BIOL2???? | Membrane Excitability | 2016 to 2025 (selected, plus 2022 mock) |  |
+| `molecules-cells-human-disease-manchester-y2` | BIOL2???? | Molecules and Cells in Human Disease | 2018 to 2025 (selected) |  |
+| `motor-systems-manchester-y2` | BIOL2???? | Motor Systems | 2016 to 2025 (selected) |  |
+| `motor-systems-hci-manchester-y2` | BIOL2???? | Motor Systems for Human Computer Interaction | 2024 |  |
+| `omic-technologies-resources-manchester-y2` | BIOL2???? | Omic Technologies and Resources | 2017 to 2025 (selected, plus example paper) |  |
+| `organismal-genetics-manchester-y2` | BIOL2???? | Organismal Genetics | 2023 to 2025 |  |
+| `parasitology-manchester-y2` | BIOL2???? | Parasitology | 2017 to 2025 (selected) |  |
+| `plants-for-the-future-manchester-y2` | BIOL2???? | Plants for the Future | 2016 to 2025 (selected) |  |
+| `principles-of-developmental-biology-manchester-y2` | BIOL2???? | Principles of Developmental Biology | 2015 to 2025 (selected) |  |
+| `principles-of-infectious-disease-manchester-y2` | BIOL2???? | Principles of Infectious Disease | 2023 to 2025 |  |
+| `proteins-manchester-y2` | BIOL2???? | Proteins | 2015 to 2025 (selected) |  |
+| `sensory-systems-manchester-y2` | BIOL2???? | Sensory Systems | 2017 to 2025 (selected) |  |
+| `sensory-systems-hci-manchester-y2` | BIOL2???? | Sensory Systems for HCI | 2024 |  |
+| `the-dynamic-cell-manchester-y2` | BIOL2???? | The Dynamic Cell | 2015 to 2024 (selected) |  |
+
+### Style
+
+Year 2 modules in this list are predominantly structured short-answer
+papers with mixed parts per question. None of the Year 2 module names
+above carry the `Essay Paper` or `Problem Paper` qualifier that Year 3
+exam papers use, so essay-only or pure problem-paper formats are not the
+expected default. Where a paper has an explicit `Mock` PDF (for example
+Membrane Excitability 2022 Mock, Drugs and the Brain 2023 Mock, Human
+Anatomy & Histology Mock) the mock is recorded as a paper of the same
+style as the live exam in that year.
+
+## Manchester School of Biological Sciences, Year 3
+
+These presets cover Year 3 modules. As with Year 2 above, course codes
+are placeholders (`BIOL3????`) until the actual School of Biological
+Sciences four-digit module suffixes are looked up. Year 3 corpora
+include both live exam papers and `Essay Paper` and `Problem Paper`
+variants for several themes (Biochemistry, Biology, Biomedical Sciences,
+Cell Biology, Developmental Biology, Genetics, Immunology, Medical
+Biochemistry, Medical Physiology, Microbiology, Molecular Biology,
+Neuroscience, Pharmacology, Pharmacology & Physiology, Plant Sciences,
+Zoology, Anatomical Sciences, Biology with Science & Society,
+Biotechnology). Each themed Essay or Problem paper is treated as its
+own preset because the rubric and expected response shape differ from
+the live module exams.
+
+Shared defaults match the Year 1 block. `Expected questions` is again
+left blank — essay papers usually require 2 to 4 long-form answers,
+problem papers usually require 4 to 8 structured answers, and
+module-specific live papers vary; the per-paper count should be set in
+the spec.
+
+| Preset ID | Course code | Course name | Typical papers | Expected questions |
+|-----------|-------------|-------------|----------------|--------------------|
+| `advanced-behavioural-evolutionary-ecology-manchester-y3` | BIOL3???? | Advanced Behavioural & Evolutionary Ecology | 2023, 2025 |  |
+| `advanced-developmental-biology-manchester-y3` | BIOL3???? | Advanced Developmental Biology | 2018 to 2024 (selected) |  |
+| `advanced-endocrinology-manchester-y3` | BIOL3???? | Advanced Endocrinology | 2024 to 2025 |  |
+| `advanced-immunology-manchester-y3` | BIOL3???? | Advanced Immunology | 2016 to 2025 (selected) |  |
+| `advanced-parasitology-manchester-y3` | BIOL3???? | Advanced Parasitology | 2023 to 2025 |  |
+| `advances-in-anatomical-sciences-manchester-y3` | BIOL3???? | Advances in Anatomical Sciences | 2017, 2023 |  |
+| `anatomical-sciences-essay-paper-manchester-y3` | BIOL3???? | Anatomical Sciences Essay Paper | 2023 to 2024 |  |
+| `bacterial-infections-of-man-manchester-y3` | BIOL3???? | Bacterial Infections of Man | 2023 |  |
+| `biochemistry-essay-paper-manchester-y3` | BIOL3???? | Biochemistry Essay Paper | 2017 to 2025 (selected) |  |
+| `biochemistry-problem-paper-manchester-y3` | BIOL3???? | Biochemistry Problem Paper | 2016 |  |
+| `biochemical-basis-of-disease-manchester-y3` | BIOL3???? | Biochemical Basis of Disease | 2023 to 2025 |  |
+| `biology-essay-paper-manchester-y3` | BIOL3???? | Biology Essay Paper | 2024 to 2025 |  |
+| `biology-problem-paper-manchester-y3` | BIOL3???? | Biology Problem Paper | 2022 |  |
+| `biology-science-society-essay-paper-manchester-y3` | BIOL3???? | Biology with Science & Society Essay Paper | 2023 to 2025 |  |
+| `biomedical-sciences-essay-paper-manchester-y3` | BIOL3???? | Biomedical Sciences Essay Paper | 2023 to 2025 |  |
+| `biomedical-sciences-problem-paper-manchester-y3` | BIOL3???? | Biomedical Sciences Problem Paper | 2019 |  |
+| `biotechnology-essay-paper-manchester-y3` | BIOL3???? | Biotechnology Essay Paper | 2023 to 2025 |  |
+| `biotic-interactions-manchester-y3` | BIOL3???? | Biotic Interactions | 2019, 2024 |  |
+| `cardiovascular-systems-manchester-y3` | BIOL3???? | Cardiovascular Systems | 2023 to 2025 |  |
+| `cell-adhesion-manchester-y3` | BIOL3???? | Cell Adhesion | 2012 to 2025 (selected) |  |
+| `cell-biology-essay-paper-manchester-y3` | BIOL3???? | Cell Biology Essay Paper | 2023 to 2024 |  |
+| `cell-signalling-manchester-y3` | BIOL3???? | Cell Signalling | 2016 to 2025 (selected) |  |
+| `chemical-communication-in-animals-manchester-y3` | BIOL3???? | Chemical Communication in Animals | 2023 |  |
+| `chemistry-of-biological-processes-manchester-y3` | BIOL3???? | Chemistry of Biological Processes | 2017 to 2025 (selected) |  |
+| `clocks-sleep-rhythms-of-life-manchester-y3` | BIOL3???? | Clocks, Sleep & the Rhythms of Life | 2015 to 2025 (selected) |  |
+| `comparative-developmental-biology-manchester-y3` | BIOL3???? | Comparative Developmental Biology | 2023 to 2024 |  |
+| `conservation-biology-manchester-y3` | BIOL3???? | Conservation Biology | 2023 to 2025 |  |
+| `developmental-biology-essay-paper-manchester-y3` | BIOL3???? | Developmental Biology Essay Paper | 2023 to 2024 |  |
+| `evolution-genes-genomes-systems-manchester-y3` | BIOL3???? | Evolution of Genes, Genomes & Systems | 2018 to 2025 (selected) |  |
+| `gene-regulation-disease-manchester-y3` | BIOL3???? | Gene Regulation & Disease | 2016 to 2025 (selected, includes 2024 CADMUS) |  |
+| `genetics-essay-paper-manchester-y3` | BIOL3???? | Genetics Essay Paper | 2016 to 2025 (selected) |  |
+| `glycobiology-manchester-y3` | BIOL3???? | Glycobiology (Glycan Functions / Glycobiology in Health & Disease) | 2017 to 2025 (selected) |  |
+| `green-biotechnology-manchester-y3` | BIOL3???? | Green Biotechnology | 2023 to 2025 |  |
+| `hormones-and-behaviour-manchester-y3` | BIOL3???? | Hormones & Behaviour | 2016 to 2025 (selected, plus question bank) |  |
+| `human-anatomy-histology-mock-manchester-y3` | BIOL3???? | Human Anatomy & Histology (Year 3 mock) | Mock |  |
+| `human-genetics-evolution-manchester-y3` | BIOL3???? | Human Genetics & Evolution | 2023 to 2025 |  |
+| `human-impacts-on-the-biosphere-manchester-y3` | BIOL3???? | Human Impacts on the Biosphere | 2016 to 2023 (selected) |  |
+| `human-reproductive-biology-manchester-y3` | BIOL3???? | Human Reproductive Biology | 2016 to 2025 (selected) |  |
+| `imaging-in-biomedical-research-manchester-y3` | BIOL3???? | Imaging in Biomedical Research | 2023 |  |
+| `immune-response-disease-manchester-y3` | BIOL3???? | Immune Response & Disease | 2023, 2025 |  |
+| `immunology-essay-paper-manchester-y3` | BIOL3???? | Immunology Essay Paper | 2023 to 2025 |  |
+| `introduction-to-nanomedicine-manchester-y3` | BIOL3???? | Introduction to Nanomedicine | 2025 |  |
+| `learning-memory-cognition-manchester-y3` | BIOL3???? | Learning, Memory & Cognition | 2017 to 2025 (selected) |  |
+| `macromolecular-recognition-manchester-y3` | BIOL3???? | Macromolecular Recognition in Biological Systems | 2017 to 2025 (selected) |  |
+| `medical-biochemistry-essay-paper-manchester-y3` | BIOL3???? | Medical Biochemistry Essay Paper | 2023 to 2025 |  |
+| `medical-physiology-essay-paper-manchester-y3` | BIOL3???? | Medical Physiology Essay Paper | 2023 to 2025 |  |
+| `membrane-transport-signalling-health-disease-manchester-y3` | BIOL3???? | Membrane Transport & Signalling in Health & Disease | 2023 to 2025 |  |
+| `microbiology-essay-paper-manchester-y3` | BIOL3???? | Microbiology Essay Paper | 2023 to 2025 |  |
+| `molecular-biology-essay-paper-manchester-y3` | BIOL3???? | Molecular Biology Essay Paper | 2021 to 2025 (selected) |  |
+| `molecular-biology-of-cancer-manchester-y3` | BIOL3???? | Molecular Biology of Cancer | 2023 to 2025 |  |
+| `neuroinflammation-health-disease-manchester-y3` | BIOL3???? | Neuroinflammation in Health & Disease | 2023 to 2025 (includes 2024 CADMUS) |  |
+| `neuropharmacology-human-health-manchester-y3` | BIOL3???? | Neuropharmacology of Human Health | 2017 to 2025 (selected) |  |
+| `neuroscience-essay-paper-manchester-y3` | BIOL3???? | Neuroscience Essay Paper | 2013 to 2025 (selected) |  |
+| `neuroscience-problem-paper-manchester-y3` | BIOL3???? | Neuroscience Problem Paper | 2001 to 2024 (selected, mixed PP1/PP2) |  |
+| `pharmacology-essay-paper-manchester-y3` | BIOL3???? | Pharmacology Essay Paper | 2023 to 2025 |  |
+| `pharmacology-physiology-essay-paper-manchester-y3` | BIOL3???? | Pharmacology & Physiology Essay Paper | 2023 to 2024 |  |
+| `plant-sciences-essay-paper-manchester-y3` | BIOL3???? | Plant Sciences Essay Paper | 2023 to 2024 |  |
+| `post-genome-biology-manchester-y3` | BIOL3???? | Post-Genome Biology | 2016 to 2026 (selected, includes 2026 mock) |  |
+| `protein-assembly-dynamics-function-manchester-y3` | BIOL3???? | Protein Assembly, Dynamics & Function | 2016 to 2025 (selected) |  |
+| `protein-sorting-manchester-y3` | BIOL3???? | Protein Sorting | 2016 to 2025 (selected) |  |
+| `role-of-diagnostics-in-medicine-manchester-y3` | BIOL3???? | Role of Diagnostics in Medicine | 2022 to 2025 |  |
+| `stem-cells-manchester-y3` | BIOL3???? | Stem Cells | 2016 to 2025 (selected) |  |
+| `toxins-toxicants-toxicity-manchester-y3` | BIOL3???? | Toxins, Toxicants & Toxicity | 2017 to 2025 (selected) |  |
+| `zoology-essay-paper-manchester-y3` | BIOL3???? | Zoology Essay Paper | 2024 to 2025 |  |
+
+### Style
+
+Year 3 modules split into three groups by paper format, inferred from
+the module name:
+
+- **Essay-only** — every module whose name ends in `Essay Paper`
+  (Anatomical Sciences, Biochemistry, Biology, Biology with Science &
+  Society, Biomedical Sciences, Biotechnology, Cell Biology,
+  Developmental Biology, Genetics, Immunology, Medical Biochemistry,
+  Medical Physiology, Microbiology, Molecular Biology, Neuroscience,
+  Pharmacology, Pharmacology & Physiology, Plant Sciences, Zoology).
+  Expect 2 to 4 long-form essay prompts per paper with no
+  short-answer scaffolding.
+- **Structured problem paper** — modules whose name ends in
+  `Problem Paper` (Biochemistry, Biology, Biomedical Sciences,
+  Neuroscience). Expect 4 to 8 multi-part structured questions per
+  paper, with explicit per-part marks rather than a single
+  free-response prompt.
+- **Module exam (mixed)** — every other Year 3 module. Default to
+  structured short-answer with mixed parts per question, the same
+  shape as the Year 2 live exams, until a per-paper override says
+  otherwise.
+
+Where the format guess is uncertain (for example
+`Advances in Anatomical Sciences` and `Bacterial Infections of Man`
+have very few archived years and could be either structured or essay
+in any given sitting), the spec author should set
+`detected_style` per paper at extraction time rather than relying on
+the preset default.
+
 ## Coverage extraction rules (all Manchester presets)
 
 When the orchestrator computes curriculum coverage from lecture material

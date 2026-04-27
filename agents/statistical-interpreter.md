@@ -27,16 +27,20 @@ narratives only and explicitly note the missing pattern layer.
 
 ## Output
 
-`<OUTPUT_DIR>/tier-narratives.json`:
+`<OUTPUT_DIR>/tier-narratives.json` (schema_version 2, supports bilingual
+when `lang=both` or `lang=zh` is set on the run):
 
 ```json
 {
   "course_id": "wma11",
   "schema_version": 2,
+  "lang": "en",
   "narratives": {
     "L13.03": {
       "headline": "Anchor — tangent/normal will appear; the most-likely pattern is P02 (tangent at named point) which has saturated 2022-2024.",
       "narrative": "...",
+      "how_it_will_be_tested": "Setup: implicit relation F(x,y)=0 plus a named point on the curve. Asked operation: derive m by implicit differentiation, substitute, then write y - y0 = m(x - x0). The 2024 question added a perpendicular-line follow-up; the vertical-tangent edge case (textbook §5.4 example 14) remains unseen since 2018 and is the highest-leverage fresh variant to drill.",
+      "exam_scope_notes": "High-frequency pattern; the examiner has been varying which named point is given but keeping the operation invariant. Watch for parametric-curve swap (P03) on a low-likelihood sitting.",
       "predicted_pattern": "L13.03.P02",
       "predicted_pattern_label": "Find tangent line at a given point",
       "saturated_patterns": ["L13.03.P02"],
@@ -51,21 +55,45 @@ narratives only and explicitly note the missing pattern layer.
 }
 ```
 
+When `lang=both`, every narrative also carries `headline_zh`,
+`narrative_zh`, `how_it_will_be_tested_zh`, `exam_scope_notes_zh`. The
+DOCX writer renders the EN block first followed by the ZH block as
+stacked parallel paragraphs (never side-by-side). When `lang=zh`, only
+the ZH fields are populated. When `lang=en` (default), do NOT emit the
+ZH fields.
+
 ## Rules
 
-- Quote `posterior_mean`, `ci_lower_95`, `ci_upper_95` verbatim from the JSON.
-  Do not round past two decimals.
-- Reference the specific `lambda` or `tau` value that would flip the tier,
-  if any. Otherwise say "the tier is robust across the swept grid."
+- Quote `posterior_mean`, `ci_lower_95`, `ci_upper_95` verbatim from the
+  JSON. Do not round past two decimals.
+- Reference the specific `lambda` or `tau` value that would flip the
+  tier, if any. Otherwise say "the tier is robust across the swept
+  grid."
 - For every anchor or core KP, the narrative MUST decompose into pattern
   language: name the dominant pattern, the most saturated pattern (which
   may or may not be the dominant), and at least one fresh pattern when
   any are flagged. Use pattern_ids verbatim.
-- The `drill_set` MUST mix recent past-paper occurrences with at least one
-  textbook example per fresh pattern when fresh patterns exist.
-- If any KP carries warnings about single-paper evidence, curriculum-only
-  inference, or all-positive / all-negative observations, surface that and
-  reduce confidence in the headline.
+- The new `how_it_will_be_tested` field is REQUIRED for every anchor and
+  core KP. 3-5 sentences. Structure:
+  1. Setup (what the question gives)
+  2. Asked operation (what the student must produce)
+  3. The dominant pattern's solution path in 1 sentence
+  4. The single most-leverage fresh or unseen variant the student should
+     prepare against, citing its textbook or lecture source
+  This field is the per-KP "cheat-sheet" the user reads first; it must
+  be pedagogical, not statistical.
+- The `exam_scope_notes` field (1-2 sentences) summarises *how the
+  examiner frames* this KP. Quote past-paper question numbers when
+  helpful (e.g. "2024 Jun Q7 added a perpendicular follow-up").
+- The `drill_set` MUST mix recent past-paper occurrences with at least
+  one textbook example per fresh pattern when fresh patterns exist.
+- If any KP carries warnings about single-paper evidence,
+  curriculum-only inference, or all-positive / all-negative
+  observations, surface that and reduce confidence in the headline.
+- When `lang=both`, write the ZH fields as a faithful but compressed
+  rendering of the EN content. Allow code-switching: ZH prose may embed
+  English technical terms (`"使用 implicit differentiation 求 m"`) — that
+  matches the user's reference docs. The EN block stays pure English.
 
 ## Forbidden actions
 

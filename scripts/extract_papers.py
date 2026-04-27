@@ -30,9 +30,9 @@ from pathlib import Path
 import fitz  # type: ignore[import-not-found]
 
 
-QUESTION_HEADER_RE = re.compile(r"^\s*(\d{1,3})[\.\)]\s+(.+)")
+QUESTION_HEADER_RE = re.compile(r"^\s*(\d{1,3})[\.\)](?:\s+(.*))?\s*$")
 OPTION_RE = re.compile(r"^\s*([A-E])[\.\)]\s+(.+)")
-PART_LABEL_RE = re.compile(r"^\s*\(([a-z]{1,3}|[ivx]{1,4})\)\s*(.*)")
+PART_LABEL_RE = re.compile(r"^\s*\(?([a-z]{1,3}|[ivx]{1,4})\)\s*(.*)")
 MARKS_INLINE_RE = re.compile(r"\[\s*(\d{1,3})\s*\]")
 MARKS_PHRASE_RE = re.compile(r"\(\s*(\d{1,3})\s*marks?\s*\)", re.IGNORECASE)
 TOTAL_MARKS_RE = re.compile(r"\[\s*Total\s*(?:[:=]?\s*)?(\d{1,3})\s*(?:marks?)?\s*\]", re.IGNORECASE)
@@ -134,9 +134,10 @@ def extract_paper(
                 if header:
                     if current is not None:
                         questions.append(_finalize(current))
+                    stem_tail = header.group(2)
                     current = {
                         "number": int(header.group(1)),
-                        "stem": header.group(2).strip(),
+                        "stem": (stem_tail or "").strip(),
                         "options": [],
                         "parts": [],
                         "marks": None,

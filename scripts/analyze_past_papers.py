@@ -272,21 +272,38 @@ def _build_observations(
     mapping: dict[str, list[dict]],
     papers: list[dict],
 ) -> list[YearObservation]:
+    """Aggregate per-paper hits for a KP.
+
+    Mapping questions encode year as Jan/Jun/Oct fractional floats
+    (e.g. ``2024.4``) while paper records carry coarser string labels
+    (``"2024"`` or ``"2024-Jun"``). Match them by integer-year so a
+    single question on a 2024 paper counts as one hit regardless of
+    sitting label.
+    """
     observations: list[YearObservation] = []
-    primary_hits_by_year: dict[str, int] = {}
+    primary_hits_by_int_year: dict[int, int] = {}
     for question in mapping.get(kp_id, []):
-        year = str(question["year"])
-        primary_hits_by_year[year] = primary_hits_by_year.get(year, 0) + 1
+        try:
+            int_year = int(float(question["year"]))
+        except (TypeError, ValueError):
+            continue
+        primary_hits_by_int_year[int_year] = (
+            primary_hits_by_int_year.get(int_year, 0) + 1
+        )
 
     for paper in papers:
         if paper.get("role", "formal") != "formal":
             continue
         year_label = str(paper["year"])
         try:
-            year_int = int(float(year_label))  # tolerate "2023.4" floats
+            year_int = int(float(year_label))  # tolerate "2023.4" or "2024-Jun"
         except ValueError:
-            continue
-        hits = primary_hits_by_year.get(year_label, 0)
+            # Fall back to extracting the leading 4-digit year if present.
+            digits = "".join(ch for ch in year_label[:4] if ch.isdigit())
+            if len(digits) != 4:
+                continue
+            year_int = int(digits)
+        hits = primary_hits_by_int_year.get(year_int, 0)
         total_questions = int(paper.get("expected_questions", 50))
         weight_override = paper.get("weight_override")
         observations.append(
@@ -308,13 +325,23 @@ def _load_pattern_layer(
     spec: dict,
     out: Path,
     args: argparse.Namespace,
-) -> tuple[dict[str, list[dict]] | None, dict[str, list[dict]] | None, dict[str, dict] | None]:
+) -> tuple[
+    list[dict] | None,
+    list,
+    list[dict] | None,
+    list[dict] | None,
+    dict[str, dict] | None,
+]:
     """Best-effort load of the pattern layer artifacts.
 
-    Returns (pattern_definitions, pattern_coverage, tier_narratives). Any
-    missing artifact returns ``None`` for its slot so the DOCX writer can
-    fall back to KP-only output.
+    Returns ``(pattern_definitions, pattern_coverage, mapping_questions,
+    kps, tier_narratives)``. Each slot is ``None`` when the corresponding
+    artifact is missing so the DOCX writer can fall back to KP-only output.
+    The ``pattern_coverage`` slot is materialised as a flat list of
+    ``PatternCoverage`` dataclass instances.
     """
+    from scripts.pattern_coverage import PatternCoverage, PatternOccurrence
+
     patterns_path = args.patterns or spec.get("patterns_path") or out / "patterns.json"
     coverage_path = (
         args.pattern_coverage
@@ -322,28 +349,68 @@ def _load_pattern_layer(
         or out / "pattern-coverage.json"
     )
     narratives_path = spec.get("tier_narratives_path") or out / "tier-narratives.json"
+    mapping_path = args.mapping or spec.get("mapping_path")
+    kps_path = spec.get("kps_path") or out / "kps.json"
 
-    pattern_definitions: dict[str, list[dict]] | None = None
-    pattern_coverage: dict[str, list[dict]] | None = None
+    pattern_definitions: list[dict] | None = None
+    pattern_coverage: list[PatternCoverage] | None = None
     tier_narratives: dict[str, dict] | None = None
+    mapping_questions: list[dict] | None = None
+    kps: list[dict] | None = None
 
     if Path(patterns_path).exists():
         payload = json.loads(Path(patterns_path).read_text())
-        pattern_definitions = {}
-        for pattern in payload.get("patterns", []):
-            pattern_definitions.setdefault(pattern["kp_id"], []).append(pattern)
+        pattern_definitions = list(payload.get("patterns", []))
 
     if Path(coverage_path).exists():
         payload = json.loads(Path(coverage_path).read_text())
-        pattern_coverage = {}
+        pattern_coverage = []
         for row in payload.get("rows", []):
-            pattern_coverage.setdefault(row["kp_id"], []).append(row)
+            occurrences = tuple(
+                PatternOccurrence(
+                    year=float(occ.get("year", 0.0)),
+                    question_number=str(occ.get("question_number", "?")),
+                    confidence=float(occ.get("confidence", 1.0)),
+                    is_primary=bool(occ.get("is_primary", True)),
+                    complications=tuple(occ.get("complications") or ()),
+                )
+                for occ in row.get("occurrences", [])
+            )
+            pattern_coverage.append(
+                PatternCoverage(
+                    kp_id=str(row["kp_id"]),
+                    pattern_id=str(row["pattern_id"]),
+                    raw_hits=int(row.get("raw_hits", 0)),
+                    weighted_hits=float(row.get("weighted_hits", 0.0)),
+                    last_seen_year=row.get("last_seen_year"),
+                    first_seen_year=row.get("first_seen_year"),
+                    inter_arrival_years_mean=row.get("inter_arrival_years_mean"),
+                    inter_arrival_years_max=row.get("inter_arrival_years_max"),
+                    saturation_index=float(row.get("saturation_index", 0.0)),
+                    freshness_flag=bool(row.get("freshness_flag", False)),
+                    predicted_score=float(row.get("predicted_score", 0.0)),
+                    complications_seen=tuple(row.get("complications_seen") or ()),
+                    complications_unseen=tuple(row.get("complications_unseen") or ()),
+                    occurrences=occurrences,
+                    warnings=tuple(row.get("warnings") or ()),
+                    tier=str(row.get("tier") or ""),
+                    tier_reasons=tuple(row.get("tier_reasons") or ()),
+                )
+            )
 
     if Path(narratives_path).exists():
         payload = json.loads(Path(narratives_path).read_text())
         tier_narratives = payload.get("narratives") or {}
 
-    return pattern_definitions, pattern_coverage, tier_narratives
+    if mapping_path and Path(mapping_path).exists():
+        payload = json.loads(Path(mapping_path).read_text())
+        mapping_questions = list(payload.get("questions", []))
+
+    if Path(kps_path).exists():
+        payload = json.loads(Path(kps_path).read_text())
+        kps = list(payload.get("kps") or payload.get("knowledge_points") or [])
+
+    return pattern_definitions, pattern_coverage, mapping_questions, kps, tier_narratives
 
 
 def cmd_analyze(args: argparse.Namespace) -> int:
@@ -418,9 +485,21 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         "coverage_path": str(coverage_path) if coverage_path else "derived-from-lectures",
     }
 
-    pattern_definitions, pattern_coverage, tier_narratives = _load_pattern_layer(
-        spec, out, args
-    )
+    (
+        pattern_definitions,
+        pattern_coverage,
+        mapping_questions,
+        kps,
+        tier_narratives,
+    ) = _load_pattern_layer(spec, out, args)
+
+    course_meta = {
+        "course_id": spec["course_id"],
+        "course_name": spec["course_name"],
+        "reference_year": reference_year,
+        "n_papers": hyperparameters["n_papers"],
+        "n_kps": len(posteriors),
+    }
 
     excel_path = write_excel(
         out / f"{spec['course_id']}-analysis.xlsx", posteriors, sweeps, loo, hyperparameters
@@ -429,16 +508,30 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         out / f"{spec['course_id']}-analysis.json", posteriors, sweeps, loo, hyperparameters
     )
     md_path = write_markdown(
-        out / f"{spec['course_id']}-analysis.md", posteriors, sweeps, hyperparameters
-    )
-    docx_path = write_docx(
-        out / f"{spec['course_id']}-analysis.docx",
+        out / f"{spec['course_id']}-analysis.md",
         posteriors,
         sweeps,
         hyperparameters,
         pattern_coverage=pattern_coverage,
         pattern_definitions=pattern_definitions,
+        mapping_questions=mapping_questions,
+        kps=kps,
         tier_narratives=tier_narratives,
+        course_meta=course_meta,
+        loo=loo,
+    )
+    docx_path = write_docx(
+        out / f"{spec['course_id']}-analysis.docx",
+        posteriors=posteriors,
+        sweeps=sweeps,
+        hyperparameters=hyperparameters,
+        pattern_coverage=pattern_coverage,
+        pattern_definitions=pattern_definitions,
+        mapping_questions=mapping_questions,
+        kps=kps,
+        tier_narratives=tier_narratives,
+        course_meta=course_meta,
+        loo=loo,
         lang=lang,
     )
     print(f"wrote {excel_path}")
