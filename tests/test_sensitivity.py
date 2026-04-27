@@ -1,13 +1,13 @@
 """Unit tests for the sensitivity and leave-one-out modules."""
 from __future__ import annotations
 
-from scripts.sensitivity import (
+from core.sensitivity import (
     leave_one_out,
     sensitivity_sweep,
     summarize_loo_for_report,
     summarize_sweep_for_report,
 )
-from scripts.statistical_model import YearObservation
+from core.statistical_model import YearObservation
 
 
 def obs(year: int, hit: bool) -> YearObservation:

@@ -16,14 +16,14 @@ from __future__ import annotations
 import json
 from typing import Literal
 
-from ..kp_cheatsheet import (
+from core.kp_cheatsheet import (
     CheatSheetExample,
     CheatSheetVariant,
     KPCheatSheet,
     build_all_cheatsheets,
 )
-from ..pattern_coverage import PatternCoverage
-from ..statistical_model import KPPosterior
+from core.pattern_coverage import PatternCoverage
+from core.statistical_model import KPPosterior
 
 
 ReportLang = Literal["en", "zh", "both"]

@@ -6,7 +6,7 @@ import math
 import numpy as np
 import pytest
 
-from scripts.statistical_model import (
+from core.statistical_model import (
     ALL_TIERS,
     YearObservation,
     analyze_kp,

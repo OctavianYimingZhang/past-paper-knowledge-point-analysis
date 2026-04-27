@@ -17,7 +17,7 @@ import math
 
 import pytest
 
-from scripts.pattern_coverage import (
+from core.pattern_coverage import (
     HOT_PREDICTED_MULTIPLIER,
     PATTERN_TIERS,
     PatternOccurrence,

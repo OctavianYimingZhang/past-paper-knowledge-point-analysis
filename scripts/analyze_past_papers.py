@@ -38,13 +38,13 @@ from scripts.extract_lectures import (
 )
 from scripts.extract_papers import load_paper_batch
 from scripts.extract_textbook import extract_textbook, textbook_to_jsonable
-from scripts.pattern_coverage import (
+from core.pattern_coverage import (
     compute_kp_pattern_coverage,
     coverage_to_jsonable,
 )
 from scripts.report_writer import write_docx, write_excel, write_json, write_markdown
-from scripts.sensitivity import leave_one_out, sensitivity_sweep
-from scripts.statistical_model import (
+from core.sensitivity import leave_one_out, sensitivity_sweep
+from core.statistical_model import (
     YearObservation,
     analyze_kp,
     with_sensitivity_band,
@@ -340,7 +340,7 @@ def _load_pattern_layer(
     The ``pattern_coverage`` slot is materialised as a flat list of
     ``PatternCoverage`` dataclass instances.
     """
-    from scripts.pattern_coverage import PatternCoverage, PatternOccurrence
+    from core.pattern_coverage import PatternCoverage, PatternOccurrence
 
     patterns_path = args.patterns or spec.get("patterns_path") or out / "patterns.json"
     coverage_path = (

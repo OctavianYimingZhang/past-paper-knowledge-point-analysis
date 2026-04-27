@@ -42,7 +42,7 @@ layer is honest frequency + recency + freshness, no more.
 
 Never produce a retention number without its credible interval. Never call
 the KP posterior "conjugate"; it is a moment-matched Beta approximation,
-as documented in `references/methodology.md`.
+as documented in `skills/past-paper-orchestrator/references/methodology.md`.
 
 ## When to invoke this skill
 
@@ -74,7 +74,8 @@ If any required input is absent, pause and ask rather than guess.
 Some stages are mechanical, some require semantic judgment, some are pure
 math. Pick the model for each stage by the rules below. Use the `Task`
 tool with an explicit `model` parameter where indicated. See
-`references/subagent-orchestration.md` for ready-to-paste prompt templates.
+`skills/past-paper-orchestrator/references/subagent-orchestration.md` for
+ready-to-paste prompt templates.
 
 | Stage | Task | Model | Notes |
 |-------|------|-------|-------|
@@ -83,11 +84,11 @@ tool with an explicit `model` parameter where indicated. See
 | 3. Lecture extraction | `extract-lectures` then review coverage shares | **Haiku 4.5** | Mechanical |
 | 3b. Textbook extraction | `extract-textbook` to capture chapter index + worked examples | **Haiku 4.5** | NEW. Skip if no textbook PDF supplied. |
 | 4. Answer-key OCR | `extract-answer-keys`, then OCR dumped images | **Haiku 4.5** | Vision required. Skip if no DOCX answer keys. |
-| 5. KP boundary optimisation | Consolidate candidate topics into the canonical KP list (`kps.json`) | **Sonnet 4.6** (`agents/topic-mapper.md`) | Semantic judgment |
-| 5b. Pattern taxonomy derivation | Read `kps.json` + `extracted-lectures.json` + `extracted-textbook.json`; emit `patterns.json` | **Sonnet 4.6** (`agents/pattern-architect.md`) | NEW. Every pattern MUST cite a source. |
-| 6. Question-to-KP-pattern mapping | Tag each question with `(primary_kp, pattern_id, alt_pattern_ids, prompt_summary, asked_operation, complications, marks, confidence)` | **Sonnet 4.6** (`agents/pattern-classifier.md`) | NEW. Confidence < 0.7 flags for review. |
+| 5. KP boundary optimisation | Consolidate candidate topics into the canonical KP list (`kps.json`) | **Sonnet 4.6** (`skills/kp-pattern-mapper/agents/topic-mapper.md`) | Semantic judgment |
+| 5b. Pattern taxonomy derivation | Read `kps.json` + `extracted-lectures.json` + `extracted-textbook.json`; emit `patterns.json` | **Sonnet 4.6** (`skills/kp-pattern-mapper/agents/pattern-architect.md`) | NEW. Every pattern MUST cite a source. |
+| 6. Question-to-KP-pattern mapping | Tag each question with `(primary_kp, pattern_id, alt_pattern_ids, prompt_summary, asked_operation, complications, marks, confidence)` | **Sonnet 4.6** (`skills/kp-pattern-mapper/agents/pattern-classifier.md`) | NEW. Confidence < 0.7 flags for review. |
 | 7. Statistical analysis | `python3 -m scripts.analyze_past_papers pattern-coverage --spec <spec>` then `analyze --spec <spec>` | Pure Python | No LLM. The CLI runs both KP-level Beta posterior and pattern-level coverage statistics. |
-| 8. Tier and pattern interpretation | Per-KP narratives with pattern decomposition, "already tested" lists, "still possible" lists, drill set | **Opus 4.7** (`agents/statistical-interpreter.md`) | High-judgment, small batch |
+| 8. Tier and pattern interpretation | Per-KP narratives with pattern decomposition, "already tested" lists, "still possible" lists, drill set | **Opus 4.7** (`skills/cheatsheet-writer/agents/statistical-interpreter.md`) | High-judgment, small batch |
 | 9. Report assembly | Render Markdown, XLSX, and DOCX from the JSON payloads + Opus narratives | **Haiku 4.5** | Already wired into `cmd_analyze`; this stage is mostly verifying. |
 
 The statistical stage MUST NOT be delegated to an LLM. KP-level Bayesian
@@ -114,14 +115,15 @@ Any summary, Markdown, DOCX, or Opus narrative MUST:
 
 ## Required files
 
-- `references/methodology.md` is the statistical source of truth.
-- `references/tier-definitions.md` names every tier rule and the parallel
-  pattern tier (`saturated`, `hot`, `fresh`, `dormant`).
-- `references/course-spec-schema.md` describes the input JSON.
-- `references/presets.md` enumerates known courses (Manchester Y1 biology
-  and Edexcel IAL Maths units).
-- `references/subagent-orchestration.md` lists the prompt templates per
-  stage.
+All shared references live under `skills/past-paper-orchestrator/references/`:
+
+- `methodology.md` is the statistical source of truth.
+- `tier-definitions.md` names every tier rule and the parallel pattern
+  tier (`saturated`, `hot`, `fresh`, `dormant`).
+- `course-spec-schema.md` describes the input JSON.
+- `presets.md` enumerates known courses (Manchester Y1 biology and
+  Edexcel IAL Maths units).
+- `subagent-orchestration.md` lists the prompt templates per stage.
 
 ## How to run end-to-end
 
@@ -136,9 +138,11 @@ Any summary, Markdown, DOCX, or Opus narrative MUST:
 6. Delegate stage 5 (KP boundaries) to a Sonnet subagent. The subagent
    writes `kps.json`.
 7. Delegate stage 5b (pattern taxonomy) to a Sonnet subagent following
-   `agents/pattern-architect.md`. The subagent writes `patterns.json`.
+   `skills/kp-pattern-mapper/agents/pattern-architect.md`. The subagent
+   writes `patterns.json`.
 8. Delegate stage 6 (mapping) to a Sonnet subagent following
-   `agents/pattern-classifier.md`. The subagent writes `mapping.json` with
+   `skills/kp-pattern-mapper/agents/pattern-classifier.md`. The subagent
+   writes `mapping.json` with
    schema_version 2 (pattern_ids, prompt_summary, etc.).
 9. Run `python3 -m scripts.analyze_past_papers pattern-coverage --spec
    <spec>` to produce `pattern-coverage.json`.

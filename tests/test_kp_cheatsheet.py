@@ -24,7 +24,7 @@ from dataclasses import replace
 
 import pytest
 
-from scripts.kp_cheatsheet import (
+from core.kp_cheatsheet import (
     CheatSheetExample,
     CheatSheetVariant,
     KPCheatSheet,
@@ -32,8 +32,8 @@ from scripts.kp_cheatsheet import (
     build_kp_cheatsheet,
     year_to_label,
 )
-from scripts.pattern_coverage import PatternCoverage, PatternOccurrence
-from scripts.statistical_model import KPPosterior
+from core.pattern_coverage import PatternCoverage, PatternOccurrence
+from core.statistical_model import KPPosterior
 
 
 # ---------------------------------------------------------------------------

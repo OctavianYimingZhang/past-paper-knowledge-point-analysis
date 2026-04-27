@@ -48,39 +48,63 @@ all three.
    the auto-generated report.
 
 See `SKILL.md` for the orchestration contract and
-`references/subagent-orchestration.md` for the prompt templates.
+`skills/past-paper-orchestrator/references/subagent-orchestration.md` for
+the prompt templates.
+
+> **Suite restructure in progress.** The skill is being split into a
+> hub-and-spokes suite (one orchestrator + multiple specialist skills) so
+> each stage can be invoked standalone or dispatched in parallel. The
+> root `SKILL.md` is still authoritative until the orchestrator
+> `skills/past-paper-orchestrator/SKILL.md` lands. Pure-Python utilities
+> have already moved to `core/`; subagent prompts and reference docs have
+> moved into `skills/<spoke>/`.
 
 ## Repository layout
 
 ```
-past-paper-knowledge-point-analysis/
-  SKILL.md
+past-paper-analysis-suite/
+  SKILL.md                                 # current entry point (Phase B will move this into the orchestrator)
   README.md
   requirements.txt
-  agents/
-    ocr-extractor.md
-    topic-mapper.md
-    statistical-interpreter.md
-  references/
-    methodology.md
-    tier-definitions.md
-    subagent-orchestration.md
-    course-spec-schema.md
-    presets.md
-    specs/
-      example-manchester-biochem.json
+  core/                                    # shared pure-Python utilities (no LLM)
+    statistical_model.py
+    pattern_coverage.py
+    sensitivity.py
+    kp_cheatsheet.py
+  skills/                                  # one Skill bundle per stage / specialist
+    past-paper-orchestrator/
+      references/
+        methodology.md
+        tier-definitions.md
+        subagent-orchestration.md
+        course-spec-schema.md
+        presets.md
+        specs/
+          example-manchester-biochem.json
+    paper-ingest/agents/ocr-extractor.md
+    kp-pattern-mapper/agents/{topic-mapper,pattern-architect,pattern-classifier}.md
+    cheatsheet-writer/agents/statistical-interpreter.md
+    drill-curator/                         # added in Phase C
+    technique-coach/                       # added in Phase C
+    stat-engine/                           # delegates to core/
+    report-renderer/                       # wraps anthropics-skills:docx + xlsx
   scripts/
-    analyze_past_papers.py     # CLI entry point
+    analyze_past_papers.py                 # CLI entry point
     extract_papers.py
     extract_lectures.py
+    extract_textbook.py
     extract_answer_keys.py
-    statistical_model.py
-    sensitivity.py
-    report_writer.py
-    vision_ocr.swift           # optional macOS OCR helper
+    report_writer/                         # md + docx + xlsx writers (used by report-renderer)
+    vision_ocr.swift                       # optional macOS OCR helper
   tests/
     test_statistical_model.py
+    test_pattern_coverage.py
     test_sensitivity.py
+    test_kp_cheatsheet.py
+    test_extract_papers.py
+    test_extract_textbook.py
+    test_report_writer_docx.py
+    fixtures/
 ```
 
 ## Installation
@@ -149,7 +173,7 @@ sensitivity sweep, and leave-one-out stability.
   by default. Results that flip tiers across the sweep are labelled
   unstable and surfaced first.
 
-Full details in `references/methodology.md`.
+Full details in `skills/past-paper-orchestrator/references/methodology.md`.
 
 ## Licensing
 

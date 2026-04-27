@@ -19,9 +19,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ..pattern_coverage import PatternCoverage
-from ..sensitivity import LeaveOneOutResult, SensitivitySweep
-from ..statistical_model import KPPosterior
+from core.pattern_coverage import PatternCoverage
+from core.sensitivity import LeaveOneOutResult, SensitivitySweep
+from core.statistical_model import KPPosterior
 from ._common import (
     APPENDIX_AUDIT,
     APPENDIX_METHODOLOGY,

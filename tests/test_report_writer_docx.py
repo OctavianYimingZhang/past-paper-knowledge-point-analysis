@@ -12,7 +12,7 @@ from pathlib import Path
 import pytest
 from docx import Document
 
-from scripts.pattern_coverage import PatternCoverage, PatternOccurrence
+from core.pattern_coverage import PatternCoverage, PatternOccurrence
 from scripts.report_writer import (
     APPENDIX_AUDIT,
     APPENDIX_METHODOLOGY,
@@ -24,11 +24,11 @@ from scripts.report_writer import (
     write_docx,
     write_markdown,
 )
-from scripts.sensitivity import (
+from core.sensitivity import (
     SensitivityCell,
     SensitivitySweep,
 )
-from scripts.statistical_model import KPPosterior
+from core.statistical_model import KPPosterior
 
 
 # ---------------------------------------------------------------------------

@@ -35,13 +35,13 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
-from ..sensitivity import (
+from core.sensitivity import (
     LeaveOneOutResult,
     SensitivitySweep,
     summarize_loo_for_report,
     summarize_sweep_for_report,
 )
-from ..statistical_model import KPPosterior
+from core.statistical_model import KPPosterior
 from ._common import (
     APPENDIX_AUDIT,
     APPENDIX_METHODOLOGY,
